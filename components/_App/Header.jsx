@@ -5,7 +5,7 @@ import { Container, Menu } from "semantic-ui-react";
 import NavItem from "./NavItem";
 
 function Header() {
-  const user = true;
+  const user = false;
 
   return (
     <Menu fluid id="menu" inverted stackable>
