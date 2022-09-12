@@ -1,23 +1,34 @@
-import { prepareServerlessUrl } from "next/dist/server/base-server";
 import { useState } from "react";
 import { Form, Button, Segment } from "semantic-ui-react";
+import axios from "axios";
 
-const NEW_USER = {
+import baseUrl from "../utils/baseUrl";
+import { handleLogin } from "../utils/auth";
+
+const BLANK_USER = {
   name: "",
   email: "",
   password: ""
 }
 
 function Signup() {
-  const [userData, setUserData] = useState(NEW_USER);
+  const [userData, setUserData] = useState(BLANK_USER);
 
   function handleChange(event) {
     const { name, value } = event.target;
     setUserData(prev => ({ ...prev, [name]: value }));
   }
 
-  function handleSubmit(event) {
-    console.log(userData);
+  async function handleSubmit() {
+    try {
+      const url = `${baseUrl}/api/signup`;
+      const payload = userData;
+      const { data } = await axios.post(url, payload);
+      handleLogin(data);
+      setUserData(BLANK_USER);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const { Schema } = mongoose;
-const { ObjectId, String } = Schema.Types;
+const { String } = Schema.Types;
 
 const UserSchema = new Schema({
   name: {
@@ -22,13 +22,9 @@ const UserSchema = new Schema({
     required: true,
     default: "user",
     enum: ["user", "admin"]
-  },
-  stacks: [
-    {
-      type: ObjectId,
-      ref: "Stack"
-    }
-  ]
+  }
+}, {
+  timestamps: true
 });
 
 export default mongoose.models.User
