@@ -1,9 +1,13 @@
 import mongoose from "mongoose";
 
 const { Schema } = mongoose;
-const { ObjectId } = Schema.Types;
+const { ObjectId, String } = Schema.Types;
 
 const StackSchema = new Schema({
+  name: {
+    type: String,
+    required: true
+  },
   user: {
     type: ObjectId,
     ref: "User"
