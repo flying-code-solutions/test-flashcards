@@ -1,6 +1,7 @@
 import axios from "axios";
+import { useRouter } from "next/router";
 import { createContext, useContext, useEffect, useState } from "react";
-import { isAuthenticated } from "../../utils/auth";
+import { handleLogin, isAuthenticated, removeCookie } from "../../utils/auth";
 import baseUrl from "../../utils/baseUrl";
 
 const AuthContext = createContext({});
@@ -8,6 +9,7 @@ const AuthContext = createContext({});
 export function AuthProvider({ children }) {
     const [user, setUser] = useState("");
     const [isAdmin, setIsAdmin] = useState(false);
+    const router = useRouter();
 
     useEffect(() => {
         async function loadUserFromCookies() {
@@ -21,8 +23,27 @@ export function AuthProvider({ children }) {
                 }
             }
         }
+        const syncLogout = event => {
+            if (event.key === "logout") {
+                setUser("");
+                setIsAdmin(false);
+                router.push("/");
+            }
+        }
+        window.addEventListener("storage", syncLogout);
         loadUserFromCookies();
+        return function cleanup() {
+            window.removeEventListener("storage", syncLogout);
+        }
     }, []);
+
+    async function login(user) {
+        const url = `${baseUrl}/api/login`;
+        const payload = { ...user };
+        const { data: token } = await axios.post(url, payload);
+        await getUserFromToken(token);
+        handleLogin(token);
+    }
 
     const getUserFromToken = async (token) => {
         const payload = { headers: { Authorization: token } };
@@ -33,8 +54,14 @@ export function AuthProvider({ children }) {
         setIsAdmin(isAdmin);
     } 
 
+    function logout() {
+        setUser("");
+        setIsAdmin(false);
+        removeCookie();
+    }
+
     return (
-        <AuthContext.Provider value={{ isAuthenticated: !!user, user, isAdmin }}>
+        <AuthContext.Provider value={{ isAuthenticated: !!user, user, isAdmin, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

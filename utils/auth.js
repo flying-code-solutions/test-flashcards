@@ -9,3 +9,9 @@ export function handleLogin(token) {
 export function isAuthenticated() {
   return cookie.get("token");
 }
+
+export function removeCookie() {
+  cookie.remove("token");
+  window.localStorage.setItem("logout", new Date());
+  router.push("/");
+}

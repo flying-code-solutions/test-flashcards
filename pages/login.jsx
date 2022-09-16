@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { Form, Button, Segment } from "semantic-ui-react";
-import axios from "axios";
 
-import baseUrl from "../utils/baseUrl";
-import { handleLogin } from "../utils/auth";
+import { useAuth } from "../components/_App/AuthProvider";
 
 const BLANK_USER = {
   name: "",
@@ -12,6 +10,7 @@ const BLANK_USER = {
 
 function Login() {
   const [userData, setUserData] = useState(BLANK_USER);
+  const { login } = useAuth();
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -20,10 +19,7 @@ function Login() {
 
   async function handleSubmit() {
     try {
-      const url = `${baseUrl}/api/login`;
-      const payload = userData;
-      const { data } = await axios.post(url, payload);
-      handleLogin(data);
+      login(userData);
       setUserData(BLANK_USER);
     } catch (error) {
       console.error(error);
