@@ -1,18 +1,93 @@
 // import Stack from "../models/Stack";
-import { useState } from "react";
-import { Form, Header, Button } from "semantic-ui-react";
+import { useEffect, useState } from "react";
+import { Form, Card, Header, Button } from "semantic-ui-react";
+import axios from "axios";
+import { parseCookies } from "nookies";
+
+import baseUrl from "../utils/baseUrl";
 
 function Stacks() {
   const [stackName, setStackName] = useState("");
+  const [stacks, setStacks] = useState([]);
+
+  const url = `${baseUrl}/api/stacks`;
+
+  useEffect(() => {
+    async function getStacks() {
+      try {
+        const payload = {
+          headers: { Authorization: token }
+        }
+        const { data } = await axios.get(url, payload);
+        setStacks(data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    getStacks();
+  }, []);
 
   function handleChange(event) {
     setStackName(event.target.value);
   }
 
+  async function handleSubmit() {
+    try {
+      const payload = {
+        headers: { Authorization: token },
+        stackName
+      }
+      const {data} = await axios.post(url, payload);
+      setStacks(prev => [...prev, data]);
+      setStackName("");
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  function mapStacksToItems(stacks) {
+    return stacks.map(stack => ({
+      header: stack.name,
+      meta: `${stack.cards.length} cards`,
+      content: stack.description,
+      fluid: true,
+      childKey: stack._id,
+      href: `${baseUrl}/stack?id=${stack._id}`,
+      extra: (
+        <Button
+          basic
+          icon="remove"
+          floated="right"
+          onClick={() => deleteStack(stack._id)}
+        />
+      )
+    }));
+  }
+
+  // todo move this to StackList component once created
+  async function deleteStack(id) {
+    try {
+      const { token } = parseCookies();
+      const url = `${baseUrl}/api/stacks`;
+      const payload = {
+        params: { id },
+        headers: {
+          Authorization: token
+        }
+      };
+      await axios.delete(url, payload);
+      setStacks(prev => prev.filter(item => item._id !== id));
+    } catch (error) {
+      console.error(error);
+    } 
+  }
+  
+
   return (
     <>
       <Header icon="add" content="Create New Stack" />
-      <Form>
+      <Form onSubmit={handleSubmit}>
         <Form.Input 
           name="name"
           label="Name"
@@ -22,6 +97,13 @@ function Stacks() {
         />
         <Button type="submit" color="purple" content="Create" />
       </Form>
+      {/* todo move into a separate StackList component */}
+      <Card.Group
+        items={mapStacksToItems(stacks)}
+        centered
+        stackable
+        itemsPerRow="3"
+      />
     </>
     );
 }
