@@ -1,5 +1,6 @@
 // import Stack from "../models/Stack";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { Form, Card, Header, Button } from "semantic-ui-react";
 import axios from "axios";
 import { parseCookies } from "nookies";
@@ -9,6 +10,7 @@ import baseUrl from "../utils/baseUrl";
 function Stacks() {
   const [stackName, setStackName] = useState("");
   const [stacks, setStacks] = useState([]);
+  const router = useRouter();
 
   const url = `${baseUrl}/api/stacks`;
 
@@ -47,20 +49,29 @@ function Stacks() {
   }
 
   function mapStacksToItems(stacks) {
+
+    // todo add description to model and to form
     return stacks.map(stack => ({
       header: stack.name,
       meta: `${stack.cards.length} cards`,
-      content: stack.description,
       fluid: true,
       childKey: stack._id,
       href: `${baseUrl}/stack?id=${stack._id}`,
       extra: (
-        <Button
-          basic
-          icon="remove"
-          floated="right"
-          onClick={() => deleteStack(stack._id)}
-        />
+        <>
+          <Button
+            basic
+            icon="add"
+            floated="right"
+            onClick={() => router.push(`/import?stack=${stack._id}`)}
+          />
+          <Button
+            basic
+            icon="remove"
+            floated="right"
+            onClick={() => deleteStack(stack._id)}
+          />
+        </>
       )
     }));
   }
