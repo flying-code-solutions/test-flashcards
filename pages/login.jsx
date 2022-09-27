@@ -4,7 +4,7 @@ import { Form, Button, Segment } from "semantic-ui-react";
 import { useAuth } from "../components/_App/AuthProvider";
 
 const BLANK_USER = {
-  name: "",
+  email: "",
   password: ""
 }
 
