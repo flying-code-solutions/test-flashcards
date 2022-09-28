@@ -6,19 +6,23 @@ import axios from "axios";
 import { parseCookies } from "nookies";
 
 import baseUrl from "../utils/baseUrl";
+import { useAuth } from "../components/_App/AuthProvider";
 
 function Stacks() {
   const [stackName, setStackName] = useState("");
   const [stacks, setStacks] = useState([]);
   const router = useRouter();
+  const { user } = useAuth();
 
   const url = `${baseUrl}/api/stacks`;
 
   useEffect(() => {
     async function getStacks() {
       try {
+        const { token } = parseCookies();
         const payload = {
-          headers: { Authorization: token }
+          headers: { Authorization: token },
+          params: { userId: user._id }
         }
         const { data } = await axios.get(url, payload);
         setStacks(data);

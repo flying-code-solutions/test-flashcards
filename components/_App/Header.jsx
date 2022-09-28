@@ -3,9 +3,10 @@ import { useRouter } from "next/router";
 import { Container, Menu } from "semantic-ui-react";
 
 import NavItem from "./NavItem";
+import { useAuth } from "./AuthProvider";
 
 function Header() {
-  const user = false;
+  const { isAuthenticated } = useAuth();
 
   return (
     <Menu fluid id="menu" inverted stackable>
@@ -16,7 +17,7 @@ function Header() {
         <NavItem label="Practice" route="/practice" />
         <NavItem label="Setup" route="/setup" />
         <Menu.Menu position="right">
-          {user
+          {isAuthenticated
             ? (
               <NavItem label="Account" route="/account" />
             )

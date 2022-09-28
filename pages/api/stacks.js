@@ -1,5 +1,8 @@
 import jwt from "jsonwebtoken";
 import Stack from "../../models/Stack";
+import connectDb from "../../utils/connectDb";
+
+connectDb();
 
 export default async (req, res) => {
     const { userId } = jwt.verify(req.headers.authorization, process.env.JWT_SECRET);
@@ -25,7 +28,7 @@ export default async (req, res) => {
 
 const handleGetRequest = async (req, res) => {
     try {
-        const stacks = await Stack.find({ user: userId });
+        const stacks = await Stack.find({ user: req.params.userId });
         res.status(200).json(stacks);
     } catch (error) {
         console.error(error);
