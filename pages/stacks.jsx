@@ -21,8 +21,7 @@ function Stacks() {
       try {
         const { token } = parseCookies();
         const payload = {
-          headers: { Authorization: token },
-          params: { userId: user._id }
+          headers: { Authorization: token }
         }
         const { data } = await axios.get(url, payload);
         setStacks(data);
@@ -40,11 +39,14 @@ function Stacks() {
 
   async function handleSubmit() {
     try {
+      const { token } = parseCookies();
+      console.log(token);
+      const headers = { headers: { Authorization: token } }
       const payload = {
-        headers: { Authorization: token },
         stackName
       }
-      const {data} = await axios.post(url, payload);
+      console.log(payload);
+      const {data} = await axios.post(url, payload, headers);
       setStacks(prev => [...prev, data]);
       setStackName("");
     } catch (error) {

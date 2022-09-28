@@ -5,12 +5,6 @@ import connectDb from "../../utils/connectDb";
 connectDb();
 
 export default async (req, res) => {
-    const { userId } = jwt.verify(req.headers.authorization, process.env.JWT_SECRET);
-
-    if (!userId) {
-        return res.status(401).send("User authentication failed!");
-    }
-
     switch (req.method) {
         case "GET":
             await handleGetRequest(req, res);
@@ -27,9 +21,19 @@ export default async (req, res) => {
 }
 
 const handleGetRequest = async (req, res) => {
+    const { userId } = jwt.verify(req.headers.authorization, process.env.JWT_SECRET);
+
+    if (!userId) {
+        return res.status(401).send("User authentication failed!");
+    }
+
     try {
-        const stacks = await Stack.find({ user: req.params.userId });
-        res.status(200).json(stacks);
+        const stacks = await Stack.find({ user: userId });
+        if (stacks) {
+            res.status(200).json(stacks);
+        } else {
+            res.status(200).send("No stacks have been created yet.");
+        }
     } catch (error) {
         console.error(error);
         res.status(500).send("Unable to fetch stacks.");
@@ -37,6 +41,12 @@ const handleGetRequest = async (req, res) => {
 }
 
 const handlePostRequest = async (req, res) => {
+    const { userId } = jwt.verify(req.headers.authorization, process.env.JWT_SECRET);
+
+    if (!userId) {
+        return res.status(401).send("User authentication failed!");
+    }
+
     try {   
         const stack = await new Stack({
             name: req.body.stackName,
