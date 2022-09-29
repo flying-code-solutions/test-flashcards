@@ -11,10 +11,6 @@ const FlashcardSchema = new Schema({
   back: {
     type: String,
     required: true
-  },
-  stack: {
-    type: ObjectId,
-    ref: "Stack"
   }
 });
 

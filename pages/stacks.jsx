@@ -66,14 +66,14 @@ function Stacks() {
       extra: (
         <>
           <Button
-            basic
-            icon="add"
+            primary
+            icon="settings"
             floated="right"
             onClick={() => router.push(`/import?stack=${stack._id}`)}
           />
           <Button
-            basic
-            icon="remove"
+            color="red"
+            icon="trash"
             floated="right"
             onClick={() => deleteStack(stack._id)}
           />
