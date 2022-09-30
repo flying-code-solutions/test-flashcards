@@ -1,16 +1,24 @@
 import mongoose from "mongoose";
 
 const { Schema } = mongoose;
-const { String, ObjectId } = Schema.Types;
+const { String } = Schema.Types;
 
 const FlashcardSchema = new Schema({
-  front: {
+  titleFront: {
     type: String,
     required: true
   },
-  back: {
+  contentFront: {
+    type: String,
+    required: false
+  },
+  titleBack: {
     type: String,
     required: true
+  },
+  contentBack: {
+    type: String,
+    required: false
   }
 });
 

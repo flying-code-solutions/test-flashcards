@@ -7,8 +7,10 @@ import { parseCookies } from "nookies";
 import baseUrl from "../utils/baseUrl";
 
 const BLANK_CARD = {
-  title: "",
-  content: ""
+    titleFront: "",
+    contentFront: "",
+    titleBack: "",
+    contentBack: ""
 }
 
 function Stack() {
@@ -55,15 +57,16 @@ function Stack() {
         }
     }
 
-    function mapCardsToItems(stacks) {
+    function mapCardsToItems(cards) {
 
         // todo add description to model and to form
         return cards.map(card => ({
-        header: card.title,
+        header: card.titleFront,
         // meta: `${stack.cards.length} cards`,
-        content: card.content,
+        meta: card.contentFront,
         fluid: true,
-        childKey: card._id
+        childKey: card._id,
+        key: card._id
         // extra: (
         //     <>
         //     <Button
@@ -88,19 +91,35 @@ function Stack() {
             <Segment>
                 <Form.Input 
                 fluid
-                name="title"
-                placeholder="Card title"
-                label="Title"
+                name="titleFront"
+                placeholder="Title - front side"
+                label="Title - front side"
                 onChange={handleChange}
-                value={cardData.title}
+                value={cardData.titleFront}
                 />
                 <Form.Input
                 fluid
-                name="content"
-                placeholder="Card content"
-                label="Content"
+                name="contentFront"
+                placeholder="Content - front side"
+                label="Content - front side"
                 onChange={handleChange}
-                value={cardData.content}
+                value={cardData.contentFront}
+                />
+                <Form.Input 
+                fluid
+                name="titleBack"
+                placeholder="Title - back side"
+                label="Title - back side"
+                onChange={handleChange}
+                value={cardData.titleBack}
+                />
+                <Form.Input
+                fluid
+                name="contentBack"
+                placeholder="Content - back side"
+                label="Content - back side"
+                onChange={handleChange}
+                value={cardData.contentBack}
                 />
                 <Button type="submit" color="purple" content="Save" />
             </Segment>
