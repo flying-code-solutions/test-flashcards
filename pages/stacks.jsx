@@ -115,9 +115,9 @@ function Stacks() {
         <Button type="submit" color="purple" content="Create" />
       </Form>
       {/* todo move into a separate StackList component */}
+      <Header icon="clone outline" content="My Stacks" style={{"marginTop": "4rem"}} />
       <Card.Group
         items={mapStacksToItems(stacks)}
-        centered
         stackable
         itemsPerRow="3"
       />

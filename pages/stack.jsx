@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { Form, Segment, Button, Card } from "semantic-ui-react";
+import { Form, Segment, Button, Card, Header } from "semantic-ui-react";
 import { parseCookies } from "nookies";
 
 import baseUrl from "../utils/baseUrl";
@@ -87,6 +87,7 @@ function Stack() {
     }
 
     return <>
+        <Header icon="add" content="Create New Card" />
         <Form onSubmit={handleSubmit}>
             <Segment>
                 <Form.Input 
@@ -124,9 +125,9 @@ function Stack() {
                 <Button type="submit" color="purple" content="Save" />
             </Segment>
         </Form>
+        <Header icon="clone outline" content="Cards" style={{"marginTop": "4rem"}} />
         <Card.Group
             items={mapCardsToItems(cards)}
-            centered
             stackable
             itemsPerRow="3"
         />
