@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
-import { Form, Dropdown, Segment, Rail, Button, Header } from "semantic-ui-react";
-import useKeypress from "react-use-keypress";
 
-// todo replace with a call to BE or getServerSideProps
-const options = [
-  { key: "0", text: "TestStack1", value: "TestStack1" },
-  { key: "1", text: "TestStack2", value: "TestStack2" },
-  { key: "2", text: "TestStack3", value: "TestStack3" }
-]
+import { useEffect, useState } from "react";
+import { Form, Segment, Rail, Button, Header } from "semantic-ui-react";
+import useKeypress from "react-use-keypress";
+import { parseCookies } from "nookies";
+import jwt from "jsonwebtoken";
+
+import Stack from "../models/Stack";
+import connectDb from "../../test-shop/utils/connectDb";
 
 const cardArr = [
   { title: "Title 1", content: "Content 1" },
@@ -15,8 +14,7 @@ const cardArr = [
   { title: "Title 3", content: "Content 3" }
 ]
 
-function Practice() {
-  const [stacks, setStacks] = useState(options);
+function Practice({ stacks }) {
   const [selectedStack, setSelectedStack] = useState("");
   const [cards, setCards] = useState(cardArr);
   const [cardIndex, setCardIndex] = useState(null);
@@ -35,26 +33,6 @@ function Practice() {
     }
   });
 
-  // useEffect(() => {
-  //   const keyDownHandler = event => {
-  //     console.log('User pressed: ', event.key);
-  //     if (isPractice) {
-  //       console.log(event.key == "ArrowRight");
-  //       if (event.key == "ArrowRight") {
-  //         handleCardChange("next");
-  //       } else if (event.key == "ArrowLeft") {
-  //         handleCardChange("prev");
-  //       }
-  //     }
-  //   };
-
-  //   document.addEventListener('keydown', keyDownHandler);
-
-  //   return () => {
-  //     document.removeEventListener('keydown', keyDownHandler);
-  //   };
-  // }, []);
-
   useEffect(() => {
     if (cardIndex !== null) {
       setCurrentCard(cards[cardIndex]);
@@ -67,13 +45,10 @@ function Practice() {
 
   function handleCardChange(dir) {
     if (dir === "next") {
-      console.log(cardIndex);
       if (cardIndex !== cards.length - 1) {
-        console.log(cardIndex);
         setCardIndex(prev => prev + 1);
       }
     } else {
-      console.log("inLeft");
       if (cardIndex !== 0) {
         setCardIndex(prev => prev - 1);
       }
@@ -86,6 +61,15 @@ function Practice() {
     setIsPractice(true);
   }
 
+  function mapStacksToDropdownItems(data) {
+    return data.map(item => ({
+      key: item._id,
+      text: item.name,
+      value: item.name,
+      cards: item.cards
+    }));
+  }
+    
   return <>
     <Header content="Practice Setup" icon="settings" />
     <Form onSubmit={startPractice}>
@@ -93,7 +77,7 @@ function Practice() {
         fluid
         label="Stack"
         placeholder="Select stack" 
-        options={stacks}
+        options={mapStacksToDropdownItems(stacks)}
         onChange={handleStackChange}
         value={selectedStack}
       />
@@ -128,6 +112,21 @@ function Practice() {
         </Rail>
       </Segment>
   </>;
+}
+
+export async function getServerSideProps(ctx) {
+  connectDb();
+
+  const { token } = parseCookies(ctx);
+  const { userId } = jwt.verify(token, process.env.JWT_SECRET);
+
+  const stacks = await Stack.find({ user: userId });
+  
+  return {
+    props: {
+      stacks: JSON.parse(JSON.stringify(stacks))
+    }
+  };
 }
 
 export default Practice;
