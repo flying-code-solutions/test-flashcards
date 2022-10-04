@@ -5,6 +5,7 @@ import { Form, Segment, Button, Card, Header } from "semantic-ui-react";
 import { parseCookies } from "nookies";
 
 import baseUrl from "../utils/baseUrl";
+import StackModel from "../models/Stack";
 
 const BLANK_CARD = {
     titleFront: "",
@@ -13,26 +14,29 @@ const BLANK_CARD = {
     contentBack: ""
 }
 
-function Stack() {
+function Stack({ cards }) {
     const [cardData, setCardData] = useState(BLANK_CARD);
-    const [cards, setCards] = useState([]);
+    // const [cards, setCards] = useState([]);
     const router = useRouter();
-    const { id: stackId } = router.query;
 
-    useEffect(() => {
-        async function getCards() {
-            const { token } = parseCookies();
-            const url = `${baseUrl}/api/cards`;
-            const payload = {
-                params: { stackId },
-                headers: { Authorization: token }
-            }
-            const { data } = await axios.get(url, payload);
-            setCards(data);
-        }
+    // useEffect(() => {
+    //     async function getCards() {
+    //         if (router.isReady) {
+    //             const { token } = parseCookies();
+    //             const url = `${baseUrl}/api/cards`;
+    //             const { id: stackId } = router.query;
+    //             console.log(stackId);
+    //             const payload = {
+    //                 params: { stackId },
+    //                 headers: { Authorization: token }
+    //             }
+    //             const { data } = await axios.get(url, payload);
+    //             setCards(data);
+    //         }
+    //     }
 
-        getCards();
-    }, []);
+    //     getCards();
+    // }, []);
 
     function handleChange(event) {
         const { name, value } = event.target;
@@ -42,6 +46,7 @@ function Stack() {
     async function handleSubmit(event) {
         event.preventDefault();
         try {
+            const { id: stackId } = router.query;
             const { token } = parseCookies();
             const url = `${baseUrl}/api/cards`;
             const headers = { headers: { Authorization: token } }
@@ -50,17 +55,17 @@ function Stack() {
                 cardData
             }
             const { data } = await axios.post(url, payload, headers);
-            setCards(prev => [...prev, data]);
+            // setCards(prev => [...prev, data]);
             setCardData(BLANK_CARD);
         } catch (error) {
             console.error(error);
         }
     }
 
-    function mapCardsToItems(cards) {
+    function mapCardsToItems(data) {
 
         // todo add description to model and to form
-        return cards.map(card => ({
+        return data.map(card => ({
         header: card.titleFront,
         // meta: `${stack.cards.length} cards`,
         meta: card.contentFront,
@@ -132,6 +137,21 @@ function Stack() {
             itemsPerRow="3"
         />
     </>;
+}
+
+export async function getServerSideProps(ctx) {
+    const { id: stackId } = ctx.query;
+    const stack = await StackModel.findOne({ _id: stackId }).populate({
+        path: "cards",
+        model: "Flashcard"
+    });
+    console.log(stack);
+    const cards = stack.cards;
+    return {
+        props: {
+            cards: JSON.parse(JSON.stringify(cards))
+        }
+    }
 }
 
 export default Stack;

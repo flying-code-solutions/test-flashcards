@@ -4,19 +4,15 @@ import { Form, Segment, Rail, Button, Header } from "semantic-ui-react";
 import useKeypress from "react-use-keypress";
 import { parseCookies } from "nookies";
 import jwt from "jsonwebtoken";
+import axios from "axios";
 
 import Stack from "../models/Stack";
 import connectDb from "../../test-shop/utils/connectDb";
-
-const cardArr = [
-  { title: "Title 1", content: "Content 1" },
-  { title: "Title 2", content: "Content 2" },
-  { title: "Title 3", content: "Content 3" }
-]
+import baseUrl from "../utils/baseUrl";
 
 function Practice({ stacks }) {
   const [selectedStack, setSelectedStack] = useState("");
-  const [cards, setCards] = useState(cardArr);
+  const [cards, setCards] = useState([]);
   const [cardIndex, setCardIndex] = useState(null);
   const [currentCard, setCurrentCard] = useState({});
   const [isPractice, setIsPractice] = useState(false);
@@ -40,6 +36,7 @@ function Practice({ stacks }) {
   }, [cardIndex]);
 
   function handleStackChange(event, { value }) {
+    console.log(value);
     setSelectedStack(value);
   }
 
@@ -55,17 +52,29 @@ function Practice({ stacks }) {
     }
   }
 
-  function startPractice(event) {
+  async function startPractice(event) {
     event.preventDefault();
+    await getCardsFromStack();
     setCardIndex(0);
     setIsPractice(true);
+  }
+
+  async function getCardsFromStack() {
+    const { token } = parseCookies();
+    const url = `${baseUrl}/api/cards`;
+    const payload = {
+        params: { stackId: selectedStack },
+        headers: { Authorization: token }
+    }
+    const { data } = await axios.get(url, payload);
+    setCards(data);
   }
 
   function mapStacksToDropdownItems(data) {
     return data.map(item => ({
       key: item._id,
       text: item.name,
-      value: item.name,
+      value: item._id,
       cards: item.cards
     }));
   }
@@ -88,8 +97,8 @@ function Practice({ stacks }) {
       />
     </Form>
     <Segment style={{minHeight: "400px"}} textAlign='center' >
-      <Header as="h1" content={currentCard.title} />
-      <p>{currentCard.content}</p>
+      <Header as="h1" content={currentCard.titleFront} />
+      <p>{currentCard.contentFront}</p>
 
         <Rail style={{width: "auto"}} internal attached position='left' size="mini">
           <Button

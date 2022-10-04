@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
 import Flashcard from "../../models/Flashcard";
 import Stack from "../../models/Stack";
+import connectDb from "../../utils/connectDb";
+
+connectDb();
 
 export default async (req, res) => {
   switch (req.method) {
@@ -16,12 +19,19 @@ export default async (req, res) => {
 }
 
 async function handleGetRequest(req, res) {
+  console.log(req.query);
+  const stackId = req.query.stackId;
   const { userId } = jwt.verify(req.headers.authorization, process.env.JWT_SECRET);
   if (!userId) {
     res.status(401).send("Invalid token!");
   }
   try {
-    const flashcards = await Flashcard.find();
+    const stack = await Stack.findOne({ _id: stackId }).populate({
+      path: "cards",
+      model: "Flashcard"
+    });
+    console.log(stack.cards);
+    const flashcards = stack.cards;
     if (flashcards) {
       res.status(200).json(flashcards);
     }
