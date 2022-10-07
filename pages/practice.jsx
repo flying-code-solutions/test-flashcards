@@ -36,7 +36,6 @@ function Practice({ stacks }) {
   }, [cardIndex]);
 
   function handleStackChange(event, { value }) {
-    console.log(value);
     setSelectedStack(value);
   }
 
