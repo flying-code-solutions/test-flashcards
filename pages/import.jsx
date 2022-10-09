@@ -6,9 +6,11 @@ import jwt from "jsonwebtoken";
 import baseUrl from "../utils/baseUrl";
 import connectDb from "../../test-shop/utils/connectDb";
 import Stack from "../models/Stack";
+import axios from "axios";
 
 function Import({ stacks }) {
     const [selectedStack, setSelectedStack] = useState("");
+    const [formData, setFormData] = useState(new FormData());
 
     function handleStackChange(event, { value }) {
         setSelectedStack(value);
@@ -34,17 +36,19 @@ function Import({ stacks }) {
             return;
         }
 
-        console.log(event.target.files);
-
-        const formData = new FormData();
-
         formData.append(event.target.name, event.target.files[0]);
-
-        console.log(formData);
     }
 
     async function handleImport() {
-        // todo
+        try {
+            const url = `${baseUrl}/api/import`;
+            const { token } = parseCookies();
+            const headers = { headers: { Authorization: token } }
+            formData.append("stackId", selectedStack);
+            const response = await axios.post(url, formData, headers);
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     return (
@@ -61,6 +65,7 @@ function Import({ stacks }) {
                 <Form.Select
                     fluid
                     label="Stack"
+                    name="file"
                     placeholder="Select stack" 
                     options={mapStacksToDropdownItems(stacks)}
                     onChange={handleStackChange}
