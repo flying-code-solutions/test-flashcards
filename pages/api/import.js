@@ -1,5 +1,6 @@
 import XLSX from "xlsx";
 import formidable from "formidable";
+import jwt from "jsonwebtoken";
 
 import Stack from "../../models/Stack";
 import Flashcard from "../../models/Flashcard";
@@ -11,6 +12,12 @@ export const config = {
 }
 
 export default async (req, res) => {
+  const { userId } = jwt.verify(req.headers.authorization, process.env.JWT_SECRET);
+
+  if (!userId) {
+    res.status(401).send("Invalid token!");
+  }
+
   const form = new formidable.IncomingForm();
 
   try {
@@ -27,7 +34,8 @@ export default async (req, res) => {
           const jsonSheet = XLSX.utils.sheet_to_json(sheet);
           const parsedData = {
             file: jsonSheet,
-            stackId: fields.stackId
+            stackId: fields.stackId,
+            stackName: fields.stackName
           }
           resolve(parsedData);
         } catch (err) {
@@ -36,6 +44,13 @@ export default async (req, res) => {
       });
     });
     console.log(data);
+    if (data.stackId === "new") {
+      const newStack = await new Stack({
+        name: data.stackName,
+        user: userId
+      }).save();
+      data.stackId = newStack._id
+    }
     for (let card of data.file) {
       const newCard = await new Flashcard({
         ...card

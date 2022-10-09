@@ -29,7 +29,7 @@ function SetupNavigation() {
           <Grid.Column>
             <Header icon>
               <Icon name='student' />
-              Add Flashcards
+              Add Flashcards From File
             </Header>
             <Button primary onClick={() => router.push("/import")}>Import</Button>
           </Grid.Column>

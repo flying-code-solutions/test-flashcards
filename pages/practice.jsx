@@ -16,6 +16,7 @@ function Practice({ stacks }) {
   const [cardIndex, setCardIndex] = useState(null);
   const [currentCard, setCurrentCard] = useState({});
   const [isPractice, setIsPractice] = useState(false);
+  const [isFrontSide, setIsFrontSide] = useState(true);
 
   useKeypress(["ArrowLeft", "ArrowRight"], (event) => {
     console.log('User pressed: ', event.key);
@@ -26,6 +27,13 @@ function Practice({ stacks }) {
       } else if (event.key == "ArrowLeft") {
         handleCardChange("prev");
       }
+    }
+  });
+
+  useKeypress(["ArrowUp"], (event) => {
+    console.log('User pressed: ', event.key);
+    if (isPractice) {
+      setIsFrontSide(prev => !prev);
     }
   });
 
@@ -95,9 +103,16 @@ function Practice({ stacks }) {
         content="Start Practice"
       />
     </Form>
-    <Segment style={{minHeight: "400px"}} textAlign='center' >
-      <Header as="h1" content={currentCard.titleFront} />
-      <p>{currentCard.contentFront}</p>
+    <Segment style={{ minHeight: "400px" }} textAlign='center' >
+      <Button
+            style={{ marginTop: "-0.5rem" }}
+            basic
+            circular
+            icon="refresh"
+            onClick={() => setIsFrontSide(prev => !prev)}
+          />
+      <Header as="h1" content={isFrontSide ? currentCard.titleFront : currentCard.titleBack} />
+      <p>{isFrontSide ? currentCard.contentFront : currentCard.contentBack}</p>
 
         <Rail style={{width: "auto"}} internal attached position='left' size="mini">
           <Button

@@ -10,10 +10,15 @@ import axios from "axios";
 
 function Import({ stacks }) {
     const [selectedStack, setSelectedStack] = useState("");
+    const [stackName, setStackName] = useState("");
     const [formData, setFormData] = useState(new FormData());
 
     function handleStackChange(event, { value }) {
         setSelectedStack(value);
+    }
+
+    function handleNameChange(event) {
+        setStackName(event.target.value);
     }
 
     function mapStacksToDropdownItems(data) {
@@ -45,6 +50,7 @@ function Import({ stacks }) {
             const { token } = parseCookies();
             const headers = { headers: { Authorization: token } }
             formData.append("stackId", selectedStack);
+            formData.append("stackName", stackName);
             const response = await axios.post(url, formData, headers);
         } catch (error) {
             console.error(error);
@@ -71,11 +77,14 @@ function Import({ stacks }) {
                     onChange={handleStackChange}
                     value={selectedStack}
                 />
-                <Form.Input 
+                {selectedStack === "new" && <Form.Input
+                    fluid
                     name="stackName"
                     label="Stack Name"
                     placeholder="Stack Name"
-                />
+                    onChange={handleNameChange}
+                    value={stackName}
+                />}
                 <Form.Input 
                     type="file"
                     label="File"

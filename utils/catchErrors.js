@@ -1,4 +1,4 @@
-export default function catchErrors(error, displayError = undefined) {
+export default function catchErrors(error, displayError) {
     let errorMsg;
     if (error.response) {
         errorMsg = error.response.data;
@@ -10,7 +10,5 @@ export default function catchErrors(error, displayError = undefined) {
         errorMsg = error.message;
         console.log("Error message", errorMsg);
     }
-    if (displayError) {
-        displayError(errorMsg);
-    }
+    displayError(errorMsg);
 }
